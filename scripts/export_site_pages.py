@@ -107,6 +107,8 @@ def main():
         index["rules"].append(entry)
         print("exported", rid)
     (out / "index.json").write_text(json.dumps(index, indent=1, ensure_ascii=False))
+    # loaded with <script>, so the browser also works when index.html is opened from disk
+    (out / "index.js").write_text("window.SEAM_INDEX = " + json.dumps(index, ensure_ascii=False) + ";\n")
 
 
 if __name__ == "__main__":

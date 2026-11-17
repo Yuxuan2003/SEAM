@@ -171,6 +171,7 @@ python -m seam.metrics runs/ds_high.jsonl</code></pre>
 
 <footer class="wrap">All people, records, sites and mailboxes in SEAM are fictitious. Icons in the figures: Twemoji (CC BY 4.0).</footer>
 
+<script src="tasks/index.js"></script>
 <script>
 const MAIN = [
   ["grp","Open-weight computer-use agents"],
@@ -225,7 +226,7 @@ function render() {
   $("note").textContent = `${rule.tier} · ${rule.operation}. ${ARM_NOTE[state.arm]}`;
 }
 
-fetch("tasks/index.json").then(r => r.json()).then(idx => {
+Promise.resolve(window.SEAM_INDEX).then(idx => {
   IDX = idx;
   idx.rules.forEach((r, i) => $("rule").add(new Option(`${r.operation}: ${r.id.replace(/_/g, " ")}`, i)));
   for (const [k, v] of Object.entries(idx.placements)) $("pl").add(new Option(v, k));
