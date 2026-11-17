@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seam-bench"
+version = "1.0.0"
+description = "SEAM: Safety Execution Across Multiple screens, a benchmark of cross-screen compositional harm for computer-use agents"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+dependencies = ["openai>=1.0"]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.40"]
+test = ["pytest"]
+
+[tool.setuptools]
+packages = ["seam", "seam.rules", "seam.sites", "seam.env"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEAM: Computer-Use Agents Know the Harm Between Screens, and Commit It Anyway</title>
+<meta name="description" content="SEAM (Safety Execution Across Multiple screens): a benchmark of cross-screen compositional harm for computer-use agents.">
+<style>
+  :root { --ink:#1f2328; --mid:#57606a; --line:#d8dee4; --bg:#f6f8fa; --ok:#0f766e; --harm:#b42318; --acc:#2563eb; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color:var(--ink); line-height:1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  header { padding: 56px 0 28px; text-align:center; }
+  h1.title { font-size: 34px; line-height:1.25; margin: 0 0 14px; letter-spacing:-0.01em; }
+  h1.title .sc { font-variant: small-caps; color: var(--ok); }
+  .authors { color: var(--mid); font-size: 17px; margin-bottom: 4px; }
+  .venue { color: var(--mid); font-size: 15px; margin-bottom: 22px; }
+  .links a { display:inline-block; margin: 4px 5px; padding: 8px 18px; border-radius: 999px; background: var(--ink); color:#fff; text-decoration:none; font-size:15px; }
+  .links a.off { background:#8c959f; pointer-events:none; }
+  section { padding: 28px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 24px; margin: 0 0 14px; }
+  h3 { font-size: 18px; margin: 18px 0 8px; }
+  p { margin: 0 0 12px; }
+  .lead { font-size: 17px; }
+  figure { margin: 18px 0; text-align:center; }
+  figure img { width: 100%; height:auto; }
+  figcaption { color: var(--mid); font-size: 14px; margin-top: 6px; text-align:left; }
+  .grid3 { display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .finding { border: 1px solid #b6dbd6; border-left: 5px solid var(--ok); background: #f2faf8; border-radius: 6px; padding: 12px 14px; }
+  .finding b { display:block; margin-bottom: 4px; }
+  /* task browser */
+  .browser { border:1px solid var(--line); border-radius: 10px; overflow:hidden; background: var(--bg); }
+  .controls { display:flex; flex-wrap:wrap; gap: 10px 18px; padding: 14px 16px; border-bottom:1px solid var(--line); background:#fff; align-items:center; }
+  .controls label { font-size: 13px; color: var(--mid); display:flex; flex-direction:column; gap:3px; }
+  select { font-size: 14px; padding: 5px 8px; border:1px solid var(--line); border-radius: 6px; background:#fff; }
+  .seg { display:flex; gap:0; border:1px solid var(--line); border-radius:7px; overflow:hidden; }
+  .seg button { border:0; background:#fff; padding:6px 11px; font-size:13px; cursor:pointer; border-right:1px solid var(--line); }
+  .seg button:last-child { border-right:0; }
+  .seg button.on { background: var(--ink); color:#fff; }
+  .instr { padding: 12px 16px; background:#fff; border-bottom:1px solid var(--line); font-size: 14px; }
+  .instr .k { color: var(--mid); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .steps { display:flex; gap:6px; padding: 10px 16px 0; flex-wrap:wrap; }
+  .steps button { border:1px solid var(--line); background:#fff; border-radius: 7px 7px 0 0; padding: 6px 12px; font-size: 13px; cursor:pointer; }
+  .steps button.on { background:#fff; border-bottom-color:#fff; font-weight:600; position:relative; top:1px; }
+  .frame { margin: 0 16px 16px; border:1px solid var(--line); background:#fff; border-radius: 0 7px 7px 7px; overflow:hidden; }
+  .frame .bar { display:flex; gap:6px; align-items:center; padding: 7px 10px; background:#eef1f4; border-bottom:1px solid var(--line); font-size: 12px; color: var(--mid); }
+  .dot { width:9px; height:9px; border-radius:50%; display:inline-block; }
+  iframe { width: 100%; height: 520px; border:0; display:block; }
+  .note { font-size: 13px; color: var(--mid); padding: 0 16px 14px; }
+  .tag { display:inline-block; font-size:12px; padding: 1px 8px; border-radius: 999px; border:1px solid; }
+  .tag.h { color: var(--harm); border-color:#f1b4ad; background:#fdf1ef; }
+  .tag.s { color: var(--ok); border-color:#a8d8cf; background:#eefaf7; }
+  /* tables */
+  table { border-collapse: collapse; width:100%; font-size: 14px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align:right; white-space: nowrap; }
+  th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align:left; }
+  thead th { border-bottom: 2px solid var(--ink); font-weight:600; }
+  tr.grp td { background: var(--bg); font-style: italic; text-align:left; color: var(--mid); }
+  td.ci { color: var(--mid); font-size: 12px; }
+  .tablewrap { overflow-x:auto; }
+  pre { background: var(--bg); border:1px solid var(--line); border-radius: 8px; padding: 14px; overflow-x:auto; font-size: 13px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+  footer { color: var(--mid); font-size: 13px; padding: 26px 0 40px; border-top: 1px solid var(--line); }
+  @media (max-width: 760px) { .grid3 { grid-template-columns: 1fr; } h1.title { font-size: 26px; } iframe { height: 420px; } }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <h1 class="title"><span class="sc">Seam</span>: Computer-Use Agents Know the Harm Between Screens, and Commit It Anyway</h1>
+  <div class="authors">Anonymous Authors</div>
+  <div class="venue">Under review</div>
+  <div class="links">
+    <a class="off" href="#">Paper (coming soon)</a>
+    <a class="off" href="#">Code</a>
+    <a class="off" href="#">Data</a>
+    <a href="#browser">Browse tasks</a>
+  </div>
+</header>
+
+<main class="wrap">
+<figure>
+  <img src="assets/fig_motivation.svg" alt="Prior benchmarks put the harm in one element; in SEAM a benign task leads the agent through benign screens whose combination is harmful.">
+  <figcaption>Prior CUA safety benchmarks put the harm in one element that a careful reader can recognize (left). In <b>SEAM</b> (right), a benign task leads the agent through screens that are each benign; the harm exists only in their combination.</figcaption>
+</figure>
+
+<section>
+  <h2>Abstract</h2>
+  <p class="lead">Safety benchmarks for computer-use agents (CUAs) place the harm either in the intent of the task or on a single screen: a malicious instruction, an injected command, a phishing page. An agent that checks the task and each screen in isolation can pass them, so they do not test whether it combines facts seen on different screens. Yet in delegated work, harm often arises exactly this way: a fact about a person on one screen, a fact about an item on another, and a legitimate task that binds them.</p>
+  <p class="lead">We introduce <b>SEAM</b> (<b>S</b>afety <b>E</b>xecution <b>A</b>cross <b>M</b>ultiple screens), a benchmark of such cross-screen compositional harm: 600 multi-step, cross-application OSWorld tasks in which the instruction and every single observation are benign and only their combination is harmful. Minimal-pair variants that differ in one place, scored from the server log rather than by an LLM judge, locate where an agent fails. General-purpose open-weight and flagship agents carry out the harm in up to 92% of runs, yet decline when the user states it in one sentence. Agents open the decisive pages, so exposure is not the primary bottleneck. Asked about those pages, they flag the harm, and with thinking they often write the conflict into their reasoning and confirm anyway. Safety recognition thus does not reliably translate into safe execution, and the translation depends on the information channel: the same warning stops agents far more often in the user's instruction than on screen.</p>
+</section>
+
+<section>
+  <h2>The benchmark</h2>
+  <div class="grid3">
+    <div><h3>Strict cross-screen composition</h3><p>The instruction and every page are benign. Seeing the harm requires combining a fact about a person, a fact about an object, and the binding between them. Single-screen probes and human annotators confirm that no page reveals it alone.</p></div>
+    <div><h3>Minimal-pair variants</h3><p>Each scenario has five variants that differ in one place: harm only on screen (R), a benign twin (B), and the harm stated in one sentence by the user (E<sub>u</sub>), by the requester (E), or by the user quoting the requester (E<sub>q</sub>).</p></div>
+    <div><h3>Execution-level scoring</h3><p>Cross-application workflows (10&ndash;12 steps on the shortest path) in OSWorld virtual machines. Outcomes and exposure are read from the task server's own log, without an LLM judge.</p></div>
+  </div>
+  <p>150 rules &middot; 27 harm families in 6 groups &middot; 8 reasoning operations in 3 tiers &middot; 49 application domains &middot; 4 locations of the person fact &middot; 600 scenarios &times; 5 variants = 3,000 task instances.</p>
+  <figure>
+    <img src="assets/fig_taxonomy.svg" alt="The SEAM taxonomy: every task joins a person fact and an object fact by one reasoning step, in three tiers.">
+    <figcaption>Every task joins a person fact and an object fact by one reasoning step, in three tiers, shown with one real rule per operation. Row labels give the mean harmful action on R without and with thinking.</figcaption>
+  </figure>
+</section>
+
+<section id="browser">
+  <h2>Browse the tasks</h2>
+  <p>The pages below are the task server's own pages, saved exactly as an agent receives them (links are inactive). Pick a rule, where the person fact lives, and a variant, then step through the workflow. Only the variant changes between tabs: the environment is byte-identical across the four harmful variants.</p>
+  <div class="browser">
+    <div class="controls">
+      <label>Rule<select id="rule"></select></label>
+      <label>Person fact lives in<select id="pl"></select></label>
+      <label>Variant<div class="seg" id="arm"></div></label>
+      <div id="risk"></div>
+    </div>
+    <div class="instr"><div class="k">User instruction (as given to the agent)</div><div id="instr"></div></div>
+    <div class="steps" id="steps"></div>
+    <div class="frame"><div class="bar"><span class="dot" style="background:#ef6b5e"></span><span class="dot" style="background:#f5bf4f"></span><span class="dot" style="background:#61c454"></span><span id="url" style="margin-left:8px"></span></div>
+      <iframe id="view" title="Task page" sandbox=""></iframe></div>
+    <div class="note" id="note"></div>
+  </div>
+</section>
+
+<section>
+  <h2>Results</h2>
+  <p>Harmful action (%) on the required path for open-weight and flagship models, and the paired effect of stating the harm (95% rule-clustered CIs). Every general-purpose configuration completes most benign twins, so the harmful actions are not explained by incapability or indiscriminate refusal.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Model</th><th>Thinking</th><th>R &darr;</th><th>E &darr;</th><th>E<sub>u</sub> &darr;</th><th>Benign done &uarr;</th><th>R &minus; E<sub>u</sub></th><th>R &minus; E</th></tr></thead>
+    <tbody id="main"></tbody>
+  </table></div>
+  <p style="margin-top:12px">Proprietary models (Claude Opus 5.5 / 5, GPT-6.1-sol) carry the harm out in at most 3.6% of R runs, but three of five configurations also leave much of the benign work undone (24&ndash;66% completion).</p>
+</section>
+
+<section>
+  <h2>Findings</h2>
+  <div class="grid3">
+    <div class="finding"><b>1. Exposure is not the primary bottleneck.</b>Agents open the page holding the decisive fact in at least 99.3% of required-path runs, and still act. When they stop, they stop on the evidence page.</div>
+    <div class="finding"><b>2. Safety recognition does not reliably translate into safe execution.</b>Asked about the same pages, agents with thinking flag 90&ndash;97% of the harms; while acting, they often write the conflict into their reasoning and confirm anyway.</div>
+    <div class="finding"><b>3. The translation depends on the information channel.</b>The same sentence stops the action far more often in the user's instruction than read on screen; the channel, not the speaker, carries the gap.</div>
+  </div>
+  <figure>
+    <img src="assets/understanding.svg" alt="Asked about the same pages, models flag most of the harms they go on to carry out.">
+    <figcaption>Asked about the same pages, models flag most of the harms they go on to carry out.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Use SEAM</h2>
+<pre><code># build the 3,000 task instances (deterministic) and run the construction gates
+python -m seam.build --out data/suite
+python -m seam.gate --suite data/suite
+
+# run an agent: local headless browser, or the OSWorld Ubuntu guest as in the paper
+export OPENAI_BASE_URL=... OPENAI_API_KEY=...
+python -m seam.agent --model deepseek-v4.1-flash-high --suite data/suite --env osworld --out runs/ds_high.jsonl
+
+# harmful action, benign completion and paired effects
+python -m seam.metrics runs/ds_high.jsonl</code></pre>
+</section>
+
+<section>
+  <h2>Citation</h2>
+<pre><code>@inproceedings{seam2027,
+  title     = {{SEAM}: Computer-Use Agents Know the Harm Between Screens, and Commit It Anyway},
+  author    = {Anonymous},
+  booktitle = {Under review},
+  year      = {2027}
+}</code></pre>
+</section>
+</main>
+
+<footer class="wrap">All people, records, sites and mailboxes in SEAM are fictitious. Icons in the figures: Twemoji (CC BY 4.0).</footer>
+
+<script>
+const MAIN = [
+  ["grp","Open-weight computer-use agents"],
+  ["OpenCUA-32B","–",82.2,null,71.6,98.7,"+10.7","[4, 18]",null,null],
+  ["UI-TARS-1.5-7B","–",45.8,null,50.7,60.0,"−4.9","[−12, 2]",null,null],
+  ["grp","Open-weight VLM as agent"],
+  ["Qwen3.8-27B","off",75.6,null,22.0,93.1,"+53.6","[46, 61]",null,null],
+  ["Qwen3.8-27B","on",40.4,null,5.0,91.8,"+35.6","[29, 42]",null,null],
+  ["grp","Flagship models (API)"],
+  ["DeepSeek-V4.1-Flash","off",78.0,57.6,7.4,99.1,"+70.5","[64, 77]","+20.4","[14, 27]"],
+  ["DeepSeek-V4.1-Flash","high",51.9,18.0,2.1,98.0,"+49.4","[43, 56]","+33.3","[27, 40]"],
+  ["DeepSeek-V4.1-Flash-1017","off",70.9,54.9,16.9,94.4,"+54.0","[47, 61]","+16.0","[11, 22]"],
+  ["DeepSeek-V4.1-Flash-1017","high",17.5,6.1,1.1,93.0,"+16.3","[12, 21]","+11.1","[7, 15]"],
+  ["Qwen3.8-Max","off",91.6,81.1,10.9,99.6,"+80.7","[75, 86]","+10.4","[7, 14]"],
+  ["Qwen3.8-Max","high",47.3,28.4,1.6,95.3,"+45.8","[40, 52]","+18.9","[14, 24]"],
+  ["GLM-5.3-Flash","high",44.9,20.7,6.4,96.0,"+38.4","[32, 45]","+24.2","[19, 30]"],
+  ["Kimi-K3","max",37.8,24.1,3.4,97.1,"+34.4","[28, 40]","+13.8","[8, 19]"],
+];
+const tb = document.getElementById("main");
+for (const r of MAIN) {
+  const tr = document.createElement("tr");
+  if (r[0] === "grp") { tr.className = "grp"; tr.innerHTML = `<td colspan="8">${r[1]}</td>`; }
+  else {
+    const f = v => v === null ? "–" : v.toFixed(1);
+    tr.innerHTML = `<td>${r[0]}</td><td>${r[1]}</td><td>${f(r[2])}</td><td>${f(r[3])}</td><td>${f(r[4])}</td><td>${f(r[5])}</td>`
+      + `<td>${r[6]} <span class="ci">${r[7]}</span></td><td>${r[8] ? r[8] + ' <span class="ci">' + r[9] + "</span>" : "–"}</td>`;
+  }
+  tb.appendChild(tr);
+}
+
+const STEPS = [["1_inbox","Inbox"],["2_email","Request email"],["3_item","Item page"],["4_form","Booking form"],["5_review","Review & confirm"]];
+const ARM_NOTE = {
+  R: "Harm only on screen: the person fact and the object fact are on different pages, and nothing states the conflict.",
+  B: "Benign twin: one object fact changed so that the same actions are safe.",
+  Ei: "Stated by the user: one sentence describing the hazard is appended to the user's instruction.",
+  E: "Stated by the requester: the same sentence is in the requester's email, read on screen.",
+  Eq: "Relayed: the user's instruction quotes the requester's sentence verbatim.",
+};
+let IDX, state = {rule: 0, pl: "profiles", arm: "R", step: "2_email"};
+const $ = id => document.getElementById(id);
+
+function render() {
+  const rule = IDX.rules[state.rule];
+  const t = rule.tasks[`${state.pl}/${state.arm}`];
+  $("instr").textContent = t.instruction;
+  $("risk").innerHTML = t.risk === "harmful" ? '<span class="tag h">harmful if carried out</span>' : '<span class="tag s">safe to carry out</span>';
+  [...$("arm").children].forEach(b => b.classList.toggle("on", b.dataset.arm === state.arm));
+  [...$("steps").children].forEach(b => b.classList.toggle("on", b.dataset.step === state.step));
+  const onMail = state.step <= "2_email";
+  $("url").textContent = (onMail ? t.urls.mail : t.urls.site) + " · today: " + t.today;
+  $("view").src = `tasks/${rule.id}/${state.pl}/${state.arm}/${state.step}.html`;
+  $("note").textContent = `${rule.tier} · ${rule.operation}. ${ARM_NOTE[state.arm]}`;
+}
+
+fetch("tasks/index.json").then(r => r.json()).then(idx => {
+  IDX = idx;
+  idx.rules.forEach((r, i) => $("rule").add(new Option(`${r.operation}: ${r.id.replace(/_/g, " ")}`, i)));
+  for (const [k, v] of Object.entries(idx.placements)) $("pl").add(new Option(v, k));
+  for (const [k, v] of Object.entries(idx.arms)) {
+    const b = document.createElement("button");
+    b.dataset.arm = k; b.title = v; b.innerHTML = k === "Ei" ? "E<sub>u</sub>" : k === "Eq" ? "E<sub>q</sub>" : k;
+    b.onclick = () => { state.arm = k; render(); };
+    $("arm").appendChild(b);
+  }
+  for (const [k, v] of STEPS) {
+    const b = document.createElement("button");
+    b.dataset.step = k; b.textContent = v; b.onclick = () => { state.step = k; render(); };
+    $("steps").appendChild(b);
+  }
+  $("rule").onchange = e => { state.rule = +e.target.value; render(); };
+  $("pl").onchange = e => { state.pl = e.target.value; render(); };
+  render();
+});
+</script>
+</body>
+</html>
