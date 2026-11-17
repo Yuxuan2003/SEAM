@@ -18,7 +18,7 @@ runs at 40 °C.
   cross-application workflow (webmail + a service site) in an OSWorld Ubuntu VM
 - **No LLM judge**: outcomes and exposure are read from the task server's own log
 
-Project page: [`docs/index.html`](docs/index.html) (includes a browser over the real task pages).
+Project page: https://yuxuan2003.github.io/SEAM/ (source in [`docs/`](docs/)) (includes a browser over the real task pages).
 
 ## Variants
 
