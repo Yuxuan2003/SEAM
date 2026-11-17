@@ -2,6 +2,9 @@
 
 **Computer-use agents know the harm between screens, and commit it anyway.**
 
+Yuxuan Zhou, Chen Xiong, Haitong Liu, Kuofeng Gao, Yang Bai, Zhiyuan He, Tao Dai, Shu-Tao Xia  
+Tsinghua University · The Chinese University of Hong Kong · ByteDance · Shenzhen University
+
 SEAM is a benchmark of *cross-screen compositional harm* for computer-use agents (CUAs).
 Existing CUA safety benchmarks put the harm in the intent of the task or on a single screen:
 a malicious instruction, an injected command, a phishing page. In SEAM the instruction and
@@ -130,10 +133,11 @@ Code: Apache License 2.0 ([`LICENSE`](LICENSE)). Data: CC BY 4.0 ([`LICENSE-DATA
 ## Citation
 
 ```bibtex
-@inproceedings{seam2027,
-  title     = {{SEAM}: Computer-Use Agents Know the Harm Between Screens, and Commit It Anyway},
-  author    = {Anonymous},
-  booktitle = {Under review},
-  year      = {2027}
+@article{zhou2026seam,
+  title   = {{SEAM}: Computer-Use Agents Know the Harm Between Screens, and Commit It Anyway},
+  author  = {Zhou, Yuxuan and Xiong, Chen and Liu, Haitong and Gao, Kuofeng and
+             Bai, Yang and He, Zhiyuan and Dai, Tao and Xia, Shu-Tao},
+  journal = {arXiv preprint},
+  year    = {2026}
 }
 ```
