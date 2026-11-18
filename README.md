@@ -21,7 +21,7 @@ runs at 40 °C.
   cross-application workflow (webmail + a service site) in an OSWorld Ubuntu VM
 - **No LLM judge**: outcomes and exposure are read from the task server's own log
 
-Project page: https://yuxuan2003.github.io/SEAM/ (source in [`docs/`](docs/)) (includes a browser over the real task pages).
+[Paper (arXiv:2611.22971)](https://arxiv.org/abs/2611.22971) · [Project page](https://yuxuan2003.github.io/SEAM/) (with a browser over the real task pages; source in [`docs/`](docs/)) · Hugging Face dataset: coming soon
 
 ## Variants
 
@@ -137,7 +137,7 @@ Code: Apache License 2.0 ([`LICENSE`](LICENSE)). Data: CC BY 4.0 ([`LICENSE-DATA
   title   = {{SEAM}: Computer-Use Agents Know the Harm Between Screens, and Commit It Anyway},
   author  = {Zhou, Yuxuan and Xiong, Chen and Liu, Haitong and Gao, Kuofeng and
              Bai, Yang and He, Zhiyuan and Dai, Tao and Xia, Shu-Tao},
-  journal = {arXiv preprint},
+  journal = {arXiv preprint arXiv:2611.22971},
   year    = {2026}
 }
 ```
